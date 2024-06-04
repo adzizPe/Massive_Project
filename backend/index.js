@@ -3,6 +3,7 @@ const app = express();
 const mysql = require('mysql');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 app.use(cors());
 app.use(express.json());
@@ -26,52 +27,57 @@ app.get('/', (req, res) => {
   res.send('Backend server is running');
 });
 
-app.post('/register', (req, res) => {
+app.post('/register', async (req, res) => {
   const { name, username, email, telp, password } = req.body;
 
-  console.log('Received data:', { name, username, email, telp, password });
-
   if (!name || !username || !email || !telp || !password) {
-    console.error('Missing fields:', { name, username, email, telp, password });
     return res.status(400).send('Missing fields');
   }
-  app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-  
-    const sql = 'SELECT * FROM user WHERE email = ?';
-    const values = [email.toLowerCase()]; // Ubah email menjadi huruf kecil
 
-  db.query(sql, values, (err, results) => {
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const sql = 'INSERT INTO user (name, username, email, telp, password) VALUES (?, ?, ?, ?, ?)';
+    const values = [name, username, email, telp, hashedPassword];
+
+    db.query(sql, values, (err, results) => {
+      if (err) {
+        return res.status(500).send('Error inserting user');
+      } else {
+        return res.status(200).send({
+          message: 'User added!',
+        });
+      }
+    });
+  } catch (error) {
+    return res.status(500).send('Error hashing password');
+  }
+});
+
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  const sql = 'SELECT * FROM user WHERE email = ?';
+  const values = [email.toLowerCase()];
+
+  db.query(sql, values, async (err, results) => {
     if (err) {
-      console.error('Error authenticating user:', err);
       return res.status(500).send('Error authenticating user');
     }
 
     if (results.length > 0) {
-      // Otentikasi berhasil
-      return res.status(200).send('Authentication successful');
+      const user = results[0];
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if (passwordMatch) {
+        const token = jwt.sign({ id: user.id }, 'your_secret_key', { expiresIn: '1h' });
+        return res.status(200).send({ message: 'Authentication successful', token, username: user.username });
+      } else {
+        return res.status(401).send('Invalid email or password');
+      }
     } else {
-      // Otentikasi gagal
       return res.status(401).send('Invalid email or password');
     }
   });
-});
-
-  
-  const sql = 'INSERT INTO user (name, username, email, telp, password) VALUES (?, ?, ?, ?, ?)';
-const values = [name, username, email, telp, password];
-
-db.query(sql, values, (err, results) => {
-  if (err) {
-    console.error('Error inserting user:', err);
-    return res.status(500).send('Error inserting user');
-  } else {
-    console.log('User inserted successfully!');
-    return res.status(200).send({
-      message: 'User added!',
-    });
-  }
-});
 });
 
 app.listen(3002, () => {

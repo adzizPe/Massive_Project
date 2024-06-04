@@ -7,16 +7,23 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [login, setLogin] = useState(null);
+  const [username, setUsername] = useState(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0)
+    window.scrollTo(0, 0);
 
-    const getLogin = localStorage.getItem('login');
-    if (getLogin) {
-      setLogin(getLogin)
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUsername(storedUsername);
     }
-  }, [login])
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('username');
+    setUsername(null);
+    navigate('/login');
+  };
 
   return (
     <div className='page'>
@@ -30,14 +37,14 @@ const Profile = () => {
             <h4 onClick={() => navigate('/?aboutUs')}>Tentang Kami</h4>
           </div>
           <div className='section-btn-login'>
-            {login === 'Pattimura' ?
+            {username ? (
               <>
-                <button onClick={() => navigate('/profile')}>Hi, {login}</button>
-                <button className='btn-logout' onClick={() => { localStorage.removeItem('login'); navigate('/') }}><LogoutRoundedIcon /></button>
+                <button onClick={() => navigate('/profile')}>Hi, {username}</button>
+                <button className='btn-logout' onClick={handleLogout}><LogoutRoundedIcon /></button>
               </>
-              :
+            ) : (
               <button onClick={() => navigate('/login')}>Masuk</button>
-            }
+            )}
           </div>
         </div>
       </nav>
@@ -75,7 +82,7 @@ const Profile = () => {
         </div>
       </main>
     </div>
-  )
+  );
 }
 
-export default Profile
+export default Profile;

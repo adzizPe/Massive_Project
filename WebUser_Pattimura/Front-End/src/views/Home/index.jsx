@@ -22,7 +22,7 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 
 const Modal = ({ closeModal }) => {
   const [files, setFiles] = useState([]);
-  const [alert, setALert] = useState(false);
+  const [alert, setAlert] = useState(false);
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -40,8 +40,8 @@ const Modal = ({ closeModal }) => {
   ));
 
   const close = () => {
-    closeModal(false)
-  }
+    closeModal(false);
+  };
 
   return (
     <div className='container-modal'>
@@ -94,7 +94,7 @@ const Modal = ({ closeModal }) => {
               <div>
                 <div className='btn-group'>
                   <button className='btn-remove' onClick={close}>Batal</button>
-                  <button onClick={() => setALert(true)}>Kirim</button>
+                  <button onClick={() => setAlert(true)}>Kirim</button>
                 </div>
               </div>
             </form>
@@ -102,16 +102,16 @@ const Modal = ({ closeModal }) => {
         </div>
       }
     </div>
-  )
-}
+  );
+};
 
 const Home = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [login, setLogin] = useState(null);
+  const [username, setUsername] = useState(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0)
+    window.scrollTo(0, 0);
     const getSearch = window.location.search;
     if (getSearch === '?faq') {
       scrollTo('faq');
@@ -122,35 +122,43 @@ const Home = () => {
       window.history.pushState({}, document.title, "/");
     }
 
-    const getLogin = localStorage.getItem('login');
-    if (getLogin) {
-      setLogin(getLogin)
+    // Ambil username dari localStorage jika ada
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUsername(storedUsername);
     }
-  }, [login])
+  }, []);
 
-  function scrollTo(page) {
-    location.href = `#${page}`
-  }
+  const scrollTo = (page) => {
+    location.href = `#${page}`;
+  };
 
-  function accordion(id) {
+  const accordion = (id) => {
     let acc = document.getElementById(`acc${id}`);
     let panel = document.getElementById(`panel${id}`);
     if (panel.style.maxHeight) {
       panel.style.maxHeight = null;
-      acc.classList.toggle('accordion-active')
+      acc.classList.toggle('accordion-active');
     } else {
       panel.style.maxHeight = panel.scrollHeight + "px";
-      acc.classList.toggle('accordion-active')
+      acc.classList.toggle('accordion-active');
     }
-  }
+  };
 
   const handleModal = () => {
-    setOpen(true)
-  }
+    setOpen(true);
+  };
 
   const handleClose = (e) => {
-    setOpen(e)
-  }
+    setOpen(e);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('username');
+    setUsername(null);
+    navigate('/login');
+  };
 
   return (
     <div className='page'>
@@ -165,14 +173,14 @@ const Home = () => {
             <h4 onClick={() => scrollTo('aboutUs')}>Tentang Kami</h4>
           </div>
           <div className='section-btn-login'>
-            {login === 'Pattimura' ?
+            {username ? (
               <>
-                <button onClick={() => navigate('/profile')}>Hi, {login}</button>
-                <button className='btn-logout' onClick={() => { localStorage.removeItem('login'); navigate('/login') }}><LogoutRoundedIcon /></button>
+                <button onClick={() => navigate('/profile')}>Hi, {username}</button>
+                <button className='btn-logout' onClick={handleLogout}><LogoutRoundedIcon /></button>
               </>
-              :
+            ) : (
               <button onClick={() => navigate('/login')}>Masuk</button>
-            }
+            )}
           </div>
         </div>
       </nav>
@@ -190,7 +198,7 @@ const Home = () => {
         </div>
         <div className='section-support'>
           <h2>Didukung oleh</h2>
-          <p>Didukung oleh Pemerintah Kota Medan dan Kementrian PUPR</p>
+          <p>Didukung oleh Pemerintah Kota Medan dan Kementerian PUPR</p>
           <div className='img-support'>
             <img src={ImageMdn} alt="medan" />
             <img src={ImagePupr} alt="pupr" />
@@ -218,7 +226,7 @@ const Home = () => {
             </div>
             <div className='content-info'>
               <img src={ImageDatabase} alt="database" />
-              <h4>Platform</h4>
+              <h4>Terintegrasi</h4>
               <p>Terintegrasi dengan informasi terbaru</p>
             </div>
           </div>
@@ -245,7 +253,7 @@ const Home = () => {
               <AddRoundedIcon fontSize='small' />
             </div>
           </button>
-          <div id='panel2' className='panelkusus'>
+          <div id='panel2' className='panel'>
             <h5>
               Anda bisa melihatnya di Riwayat laporan.
             </h5>
@@ -259,7 +267,7 @@ const Home = () => {
           </button>
           <div id='panel3' className='panel'>
             <h5>
-              memasukkan lokasi yang anda mau lapor, setelah itu ada berapa sekiranya estimasi lubang yang anda temui,dan masukkan foto atau gambar lubang yang ingin kamu lapor.
+              Memasukkan lokasi yang Anda mau lapor, setelah itu ada berapa sekiranya estimasi lubang yang Anda temui, dan masukkan foto atau gambar lubang yang ingin Anda lapor.
             </h5>
           </div>
           <button id='acc4' className='accordion' onClick={() => accordion(4)}>
@@ -271,7 +279,7 @@ const Home = () => {
           </button>
           <div id='panel4' className='panel'>
             <h5>
-             Anda bisa menghubungi kami melalui sosial media kami yang tertera di pojok kanan paling bawah.
+              Anda bisa menghubungi kami melalui sosial media kami yang tertera di pojok kanan paling bawah.
             </h5>
           </div>
         </div>
@@ -286,7 +294,7 @@ const Home = () => {
                 Holify adalah platform yang menyediakan solusi dalam bidang infrastruktur jalanan. Platform ini memudahkan untuk melakukan pelaporan dan mencari informasi terkait jalanan rusak.
               </h5>
               <h5>
-                Dengan Holify,anda dapat melakukan pelaporan terkait jalanan rusak didaerah anda dengan cepat dan mudah secara online tanpa harus melaporkan secara langsung ke pihak berwajib karena dengan Holify akan menyampaikan laporan anda kepada pihak pemerintah.
+                Dengan Holify, Anda dapat melakukan pelaporan terkait jalanan rusak di daerah Anda dengan cepat dan mudah secara online tanpa harus melaporkan secara langsung ke pihak berwajib karena dengan Holify akan menyampaikan laporan Anda kepada pihak pemerintah.
               </h5>
             </div>
           </div>
@@ -330,7 +338,8 @@ const Home = () => {
         </footer>
       </main>
     </div>
-  )
+  );
 }
 
-export default Home
+export default Home;
+         
