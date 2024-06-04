@@ -48,7 +48,7 @@ const Modal = ({ closeModal }) => {
       {alert &&
         <div className='content-alert'>
           <div className='content-modal-alert'>
-            <h1>Laporanmu telah terkirim </h1>
+            <h2>Laporanmu telah terkirim </h2>
             <button onClick={close}>Selesai</button>
           </div>
         </div>
@@ -168,7 +168,7 @@ const Home = () => {
             {login === 'Pattimura' ?
               <>
                 <button onClick={() => navigate('/profile')}>Hi, {login}</button>
-                <button className='btn-logout' onClick={() => { localStorage.removeItem('login'); navigate('/') }}><LogoutRoundedIcon /></button>
+                <button className='btn-logout' onClick={() => { localStorage.removeItem('login'); navigate('/login') }}><LogoutRoundedIcon /></button>
               </>
               :
               <button onClick={() => navigate('/login')}>Masuk</button>
@@ -185,7 +185,7 @@ const Home = () => {
             <button onClick={handleModal}>Lapor</button>
           </div>
           <div className='right-side'>
-            <img src={ImageCar} alt="Car" width={416} />
+            <img src={ImageCar} alt="Car" width={350} />
           </div>
         </div>
         <div className='section-support'>

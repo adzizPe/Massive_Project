@@ -28,7 +28,7 @@ const History = () => {
         <div className='section-navbar'>
           <img src={iconHolify} alt="icon" />
           <div className='section-list'>
-            <h4 onClick={() => navigate('/')}>Berandal</h4>
+            <h4 onClick={() => navigate('/')}>Beranda</h4>
             <h4 className='active'>Riwayat</h4>
             <h4 onClick={() => navigate('/?faq')}>FAQ</h4>
             <h4 onClick={() => navigate('/?aboutUs')}>Tentang Kami</h4>

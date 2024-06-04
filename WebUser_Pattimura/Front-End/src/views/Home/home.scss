@@ -39,13 +39,14 @@
   }
 
   main {
-    margin-top: 200px;
+    margin-top: 150px;
 
     .section-main {
       display: flex;
       justify-content: space-between;
       width: 1086px;
       margin-top: 150px;
+      margin-bottom: 150px;
 
       .left-side {
         h1:nth-child(2) {
@@ -108,6 +109,7 @@
       align-items: center;
       width: 1086px;
       margin-top: 200px;
+      padding-top: 50px;
 
       .accordion {
         display: grid;
@@ -188,6 +190,7 @@
       align-items: center;
       width: 1086px;
       margin-top: 200px;
+      padding-top: 50px;
 
       .content-about-us {
         display: flex;
@@ -307,11 +310,11 @@
   backdrop-filter: blur(6px);
 
   .content-modal-alert {
+    margin-top: 200px;
     display: flex;
-    flex-direction: column;
     align-items: center;
+    flex-direction: column;
     width: 1086px;
-    margin-top: 80px;
     padding: 30px;
     padding-bottom: 50px;
     background-color: white;
@@ -326,13 +329,14 @@
   .content-modal {
     width: 1086px;
     height: 650px;
-    margin-top: 80px;
+    margin-top: 20px;
     padding: 20px 30px;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 5px 20px 0px rgba(0, 0, 0, 0.171);
 
     .header-modal {
+      
       position: relative;
       display: flex;
       align-items: center;
