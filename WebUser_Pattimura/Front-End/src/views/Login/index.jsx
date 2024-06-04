@@ -3,15 +3,36 @@ import { useNavigate } from 'react-router-dom';
 import iconText from '../../assets/holify-text.png';
 import imgCar from '../../assets/car2.png';
 import imgGoogle from '../../assets/google.png';
+import axios from 'axios';
+import { useState } from 'react';
 
 const Login = () => {
+  const [errorMessage, setErrorMessage] = useState(''); // State untuk menyimpan pesan kesalahan
   const navigate = useNavigate();
 
-  function Login(e) {
-    e.preventDefault();
-    localStorage.setItem('login', 'Pattimura');
-    navigate('/');
-  }
+        const handleLogin = async (e) => {
+          e.preventDefault();
+          const email = e.target.elements.email.value;
+          const password = e.target.elements.password.value;
+        
+          try {
+            const response = await axios.post('http://localhost:3002/login', { email, password });
+        
+            if (response.status === 200) {
+              const { token } = response.data;
+              localStorage.setItem('authToken', token);
+              navigate('/');
+            }
+          } catch (error) {
+            if (error.response && error.response.status === 401) {
+              setErrorMessage('Email atau password salah.'); // Menyimpan pesan kesalahan dari respons server
+            } else {
+              console.error('Error authenticating user:', error.response ? error.response.data : error.message);
+              setErrorMessage('Terjadi kesalahan saat mengautentikasi pengguna.'); // Menyimpan pesan kesalahan umum
+            }
+          }
+        };
+  
 
   return (
     <div className='page'>
@@ -27,12 +48,12 @@ const Login = () => {
             <h4 className='active'>Masuk</h4>
             <h4 onClick={() => navigate('/register')}>Daftar</h4>
           </div>
-          <form onSubmit={Login}>
+          <form onSubmit={handleLogin}>
             <label htmlFor='email'>Email</label>
             <input type="email" id='email' required />
-            <label htmlFor='pass'>Password</label>
-            <input type="password" id='pass' required />
-            <p>Lupa password?</p>
+            <label htmlFor='password'>Password</label>
+            <input type="password" id='password' required />
+            <p>{errorMessage}</p> {/* Menampilkan pesan kesalahan */}
             <button className='btn-login' type='submit'>Masuk</button>
           </form>
           <p>Atau lanjut dengan</p>
@@ -40,7 +61,7 @@ const Login = () => {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Login
+export default Login;
