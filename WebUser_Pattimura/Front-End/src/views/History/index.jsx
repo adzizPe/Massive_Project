@@ -6,21 +6,31 @@ import imgHistory from '../../assets/history.png';
 import instagram from '../../assets/instagram.png';
 import twitter from '../../assets/twitter.png';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import Popup from '../component/Popup'; // Import the Popup component
+
 
 const History = () => {
   const navigate = useNavigate();
-  const [login, setLogin] = useState(null);
-
+  const [username, setUsername] = useState(null);
+  const [filter, setFilter] = useState('Paling Baru');
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" })
-    const getLogin = localStorage.getItem('login');
-    if (getLogin) {
-      setLogin(getLogin)
+    window.scrollTo({ top: 0, behavior: "instant" });
+
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUsername(storedUsername);
     }
-  }, [])
+  }, []);
 
-
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('username');
+    setUsername(null);
+    navigate('/login');
+  };
 
   return (
     <div className='page'>
@@ -34,14 +44,14 @@ const History = () => {
             <h4 onClick={() => navigate('/?aboutUs')}>Tentang Kami</h4>
           </div>
           <div className='section-btn-login'>
-            {login === 'Pattimura' ?
+            {username ? (
               <>
-                <button onClick={() => navigate('/profile')}>Hi, {login}</button>
-                <button className='btn-logout' onClick={() => { localStorage.removeItem('login'); navigate('/') }}><LogoutRoundedIcon /></button>
+                <button onClick={() => navigate('/profile')}>Hi, {username}</button>
+                <button className='btn-logout' onClick={handleLogout}><LogoutRoundedIcon /></button>
               </>
-              :
+            ) : (
               <button onClick={() => navigate('/login')}>Masuk</button>
-            }
+            )}
           </div>
         </div>
       </nav>
@@ -94,7 +104,7 @@ const History = () => {
           <div className='section-footer'>
             <div className='section-list'>
               <p onClick={() => navigate('/')}>Beranda</p>
-              <p onClick={() => scrollTo(0, 0)}>Riwayat</p>
+              <p onClick={() => window.scrollTo(0, 0)}>Riwayat</p>
               <p onClick={() => navigate('/?faq')}>FAQ</p>
               <p onClick={() => navigate('/?aboutUs')}>Tentang Kami</p>
             </div>
@@ -109,7 +119,7 @@ const History = () => {
         </footer>
       </main>
     </div>
-  )
+  );
 }
 
-export default History
+export default History;
