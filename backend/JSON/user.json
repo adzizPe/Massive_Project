@@ -1,12 +1,10 @@
-[
-{"type":"header","version":"5.2.1","comment":"Export to JSON plugin for PHPMyAdmin"},
-{"type":"database","name":"holify"},
-{"type":"table","name":"user","database":"holify","data":
-[
-{"iduser":"23","name":"nila","username":"nila","email":"nila@gmail.com","telp":"nila","password":"$2b$10$efwEiZjM9xW1g.E8B..omeCktoDb14.XV.ZkbFmHb3Bw1.w7n8pdC","profile_img":null},
-{"iduser":"24","name":"angga","username":"arif","email":"anggasaputra@gmail.com","telp":"082121213131","password":"$2b$10$Q.AhqrI4o2t6p5JDzAlr7OI14DI.pKk9.x6thOH2vgNuStHMH.7QG","profile_img":null},
-{"iduser":"25","name":"Ahmad Nazhmy ","username":"Nazhmy","email":"nazhmy@gmail.com","telp":"08123456789","password":"$2b$10$MEPwD3Fmpq0m3VKk4cLeo.QoaK.g9EX95g7HqGoXKTVOwXBP.hriC","profile_img":null},
-{"iduser":"26","name":"ahmad","username":"ahmad","email":"ahmad@gmail.com","telp":"08111111111","password":"$2b$10$mqxvB4OPDMFQzpT7TAOS.OXmULYljfG8aC.gzlvXTU4jp0CjvtqEy","profile_img":null}
-]
-}
-]
+$json_data = '[
+    {"type":"header","version":"5.2.1","comment":"Export to JSON plugin for PHPMyAdmin"},
+    {"type":"database","name":"holify"},
+    {"type":"table","name":"user","database":"holify","data":[
+        {"iduser":"23","name":"nila","username":"nila","email":"nila@gmail.com","telp":"nila","password":"$2b$10$efwEiZjM9xW1g.E8B..omeCktoDb14.XV.ZkbFmHb3Bw1.w7n8pdC","profile_img":null},
+        {"iduser":"24","name":"angga","username":"arif","email":"anggasaputra@gmail.com","telp":"082121213131","password":"$2b$10$Q.AhqrI4o2t6p5JDzAlr7OI14DI.pKk9.x6thOH2vgNuStHMH.7QG","profile_img":null},
+        {"iduser":"25","name":"Ahmad Nazhmy ","username":"Nazhmy","email":"nazhmy@gmail.com","telp":"08123456789","password":"$2b$10$MEPwD3Fmpq0m3VKk4cLeo.QoaK.g9EX95g7HqGoXKTVOwXBP.hriC","profile_img":null},
+        {"iduser":"26","name":"ahmad","username":"ahmad","email":"ahmad@gmail.com","telp":"08111111111","password":"$2b$10$mqxvB4OPDMFQzpT7TAOS.OXmULYljfG8aC.gzlvXTU4jp0CjvtqEy","profile_img":null}
+    ]}
+]';
