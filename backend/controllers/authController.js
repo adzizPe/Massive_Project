@@ -1,13 +1,6 @@
-const express = require('express');
-const app = express();
 const mysql = require('mysql');
-const cors = require('cors');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const authRoutes = require('./routes/authRoutes');
-
-app.use(cors());
-app.use(express.json());
+const jwt = require('jsonwebtoken');
 
 const db = mysql.createConnection({
   user: 'root',
@@ -24,12 +17,7 @@ db.connect((err) => {
   console.log('Connected to the database');
 });
 
-app.get('/', (req, res) => {
-  res.send('Backend server jalan');
-});
-app.use('/auth', authRoutes);
-
-app.post('/register', async (req, res) => {
+exports.register = async (req, res) => {
   const { name, username, email, telp, password } = req.body;
 
   if (!name || !username || !email || !telp || !password) {
@@ -53,9 +41,9 @@ app.post('/register', async (req, res) => {
   } catch (error) {
     return res.status(500).send('Error hashing password');
   }
-});
+};
 
-app.post('/login', (req, res) => {
+exports.login = (req, res) => {
   const { email, password } = req.body;
 
   const sql = 'SELECT * FROM user WHERE email = ?';
@@ -80,8 +68,4 @@ app.post('/login', (req, res) => {
       return res.status(401).send('Invalid email or password');
     }
   });
-});
-
-app.listen(3002, () => {
-  console.log('Server is running on port 3002');
-});
+};

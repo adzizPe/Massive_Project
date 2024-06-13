@@ -64,6 +64,8 @@ const Profile = () => {
     navigate('/login');
   };
 
+  
+
   return (
     <div className='page'>
       <nav id='beranda'>
@@ -111,7 +113,7 @@ const Profile = () => {
               <button onClick={handleSaveChanges}>Simpan</button>
             </div>
             <div className='right-side'>
-              <img src={profilePicture || imgProfile} alt="profile" width={300} />
+              <img src={profilePicture || imgProfile} alt="profile" className='profile-picture' />
               <div className='section-btn-profile'>
                 <input type="file" accept="image/*" onChange={handleProfilePictureChange} style={{ display: 'none' }} id="upload-button" />
                 <button onClick={() => document.getElementById('upload-button').click()}>Ganti</button>

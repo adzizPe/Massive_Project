@@ -8,6 +8,11 @@ const PopupCategoryCard = ({ item, onClose }) => {
         {item.foto}
         <br/><h3>{item.lokasi}</h3>
         <p>{item.deskripsi}</p>
+        <div className="status-buttons">
+            <button className="status-button selesai">Selesai</button>
+            <button className="status-button proses">Proses</button>
+          </div>
+
       </div>
     </div>
   );
