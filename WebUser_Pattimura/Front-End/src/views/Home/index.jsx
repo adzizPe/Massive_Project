@@ -19,10 +19,19 @@ import ImgClose from '../../assets/close.png';
 import ImgSelect from '../../assets/select.png';
 import ImgUpload from '../../assets/upload.png';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import axios from 'axios';
+
 
 const Modal = ({ closeModal }) => {
   const [files, setFiles] = useState([]);
   const [alert, setAlert] = useState(false);
+  const [formData, setFormData] = useState({
+    location: '',
+    numberOfPotholes: '',
+    additionalDetails: '',
+    status: 'menunggu', // Default status
+    category: 'sedang', // Default category
+  });
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -33,6 +42,35 @@ const Modal = ({ closeModal }) => {
   const handleFileInputChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setFiles(selectedFiles);
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log('Submit button clicked');
+
+    const data = new FormData();
+    data.append('location', formData.location);
+    data.append('numberOfPotholes', formData.numberOfPotholes);
+    data.append('additionalDetails', formData.additionalDetails);
+    data.append('status', formData.status);
+    data.append('category', formData.category);
+
+    files.forEach((file, index) => {
+      data.append('photos', file);
+    });
+
+    try {
+      console.log('Sending data:', data);
+      const response = await axios.post('http://localhost:3002/reports', data);
+      console.log('Response:', response);
+      setAlert(true);
+    } catch (error) {
+      console.error('Error submitting report:', error);
+    }
   };
 
   const fileList = files.map((file, index) => (
@@ -66,21 +104,45 @@ const Modal = ({ closeModal }) => {
             </div>
           </div>
           <div className='body-modal'>
-            <form action="#">
-              <label htmlFor="loc">Lokasi*</label>
-              <input type="text" id='loc' />
-              <div className='double-box-input'>
+            <form onSubmit={handleSubmit}>
+              <label htmlFor="location">Lokasi*</label>
+              <input 
+                type="text" 
+                id='location' 
+                value={formData.location}
+                onChange={handleChange}
+                required 
+              />
+               <div className='double-box-input'>
                 <div className='box-input'>
-                  <label htmlFor="numb">Estimasi Jumlah Lubang*</label>
-                  <input type="number" id='numb' />
+                <label htmlFor="numberOfPotholes">Estimasi Jumlah Lubang*</label>
+                  <input 
+                    type="number" 
+                    id='numberOfPotholes' 
+                    value={formData.numberOfPotholes}
+                    onChange={handleChange}
+                    required 
+                  />
                 </div>
                 <div className='box-input'>
-                  <label htmlFor="detail">Detail Tambahan (opsional)</label>
-                  <input type="text" id='detail' />
+                  <label htmlFor="additionalDetails">Detail Tambahan (opsional)</label>
+                  <input 
+                    type="text" 
+                    id='additionalDetails' 
+                    value={formData.additionalDetails}
+                    onChange={handleChange}
+                  />
                 </div>
               </div>
               <div className="drop-container" onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
-                <input type="file" id="fileInput" className="drop-input" accept="image/*" multiple onChange={handleFileInputChange} />
+                <input 
+                  type="file" 
+                  id="fileInput" 
+                  className="drop-input" 
+                  accept="image/*" 
+                  multiple 
+                  onChange={handleFileInputChange} 
+                />
                 <label htmlFor="fileInput" className="drop-label">
                   <img src={ImgUpload} alt="upload" />
                   <div>
@@ -93,8 +155,8 @@ const Modal = ({ closeModal }) => {
               </div>
               <div>
                 <div className='btn-group'>
-                  <button className='btn-remove' onClick={close}>Batal</button>
-                  <button onClick={() => setAlert(true)}>Kirim</button>
+                  <button type='button' className='btn-remove' onClick={close}>Batal</button>
+                  <button type='submit'>Kirim</button>
                 </div>
               </div>
             </form>
@@ -104,6 +166,8 @@ const Modal = ({ closeModal }) => {
     </div>
   );
 };
+
+
 
 const Home = () => {
   const navigate = useNavigate();

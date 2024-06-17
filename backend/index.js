@@ -4,10 +4,24 @@ const mysql = require('mysql');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const multer = require('multer');
+const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 
 app.use(cors());
 app.use(express.json());
+
+// Multer configuration for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
 
 const db = mysql.createConnection({
   user: 'root',
@@ -27,6 +41,7 @@ db.connect((err) => {
 app.get('/', (req, res) => {
   res.send('Backend server jalan');
 });
+
 app.use('/auth', authRoutes);
 
 app.post('/register', async (req, res) => {
@@ -78,6 +93,33 @@ app.post('/login', (req, res) => {
       }
     } else {
       return res.status(401).send('Invalid email or password');
+    }
+  });
+});
+
+// Add report submission endpoint with debugging
+app.post('/reports', upload.array('photos', 10), (req, res) => {
+  const { iduser, location, description, status, category } = req.body;
+  const laporan_date = new Date();
+  const photos = req.files.map(file => file.filename);
+
+  if (!iduser || !location || !description) {
+    return res.status(400).send('ID user, location, and description are required');
+  }
+
+  const sql = 'INSERT INTO reports (iduser, laporan_date, location, description, status, category, photo) VALUES (?, ?, ?, ?, ?, ?, ?)';
+  const values = [iduser, laporan_date, location, description, status || 'pending', category, JSON.stringify(photos)];
+
+  db.query(sql, values, (err, results) => {
+    if (err) {
+      console.error('Error inserting report:', err);
+      return res.status(500).send('Error inserting report');
+    } else {
+      console.log('Report added successfully:', results);
+      return res.status(200).send({
+        message: 'Report added!',
+        reportId: results.insertId,
+      });
     }
   });
 });
