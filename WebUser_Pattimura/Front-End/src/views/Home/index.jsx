@@ -2,6 +2,10 @@ import './home.scss';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import axios from 'axios';
+
+// Importing images
 import iconHolify from '../../assets/holify-icon.png';
 import ImageCar from '../../assets/car.png';
 import ImageMdn from '../../assets/medan.png';
@@ -18,10 +22,8 @@ import ImgAdd from '../../assets/add.png';
 import ImgClose from '../../assets/close.png';
 import ImgSelect from '../../assets/select.png';
 import ImgUpload from '../../assets/upload.png';
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
-import axios from 'axios';
 
-
+// Modal Component for report submission
 const Modal = ({ closeModal }) => {
   const [files, setFiles] = useState([]);
   const [alert, setAlert] = useState(false);
@@ -29,8 +31,8 @@ const Modal = ({ closeModal }) => {
     location: '',
     numberOfPotholes: '',
     additionalDetails: '',
-    status: 'menunggu', // Default status
-    category: 'sedang', // Default category
+    status: 'menunggu', // Default status  
+    category: 'sedang', // Default category  
   });
 
   const handleDrop = (e) => {
@@ -51,23 +53,37 @@ const Modal = ({ closeModal }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Submit button clicked');
-
+  
     const data = new FormData();
     data.append('location', formData.location);
     data.append('numberOfPotholes', formData.numberOfPotholes);
     data.append('additionalDetails', formData.additionalDetails);
     data.append('status', formData.status);
     data.append('category', formData.category);
-
-    files.forEach((file, index) => {
+  
+    files.forEach((file) => {
       data.append('photos', file);
     });
-
+  
     try {
       console.log('Sending data:', data);
-      const response = await axios.post('http://localhost:3002/reports', data);
+      const response = await axios.post('http://localhost:3002/reports', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       console.log('Response:', response);
       setAlert(true);
+
+      // Reset form state after successful submission
+      setFormData({
+        location: '',
+        numberOfPotholes: '',
+        additionalDetails: '',
+        status: 'menunggu',
+        category: 'sedang',
+      });
+      setFiles([]);
     } catch (error) {
       console.error('Error submitting report:', error);
     }
@@ -78,8 +94,12 @@ const Modal = ({ closeModal }) => {
   ));
 
   const close = () => {
+    setAlert(false);
     closeModal(false);
   };
+
+
+
 
   return (
     <div className='container-modal'>
@@ -113,9 +133,9 @@ const Modal = ({ closeModal }) => {
                 onChange={handleChange}
                 required 
               />
-               <div className='double-box-input'>
+              <div className='double-box-input'>
                 <div className='box-input'>
-                <label htmlFor="numberOfPotholes">Estimasi Jumlah Lubang*</label>
+                  <label htmlFor="numberOfPotholes">Estimasi Jumlah Lubang*</label>
                   <input 
                     type="number" 
                     id='numberOfPotholes' 
@@ -167,8 +187,7 @@ const Modal = ({ closeModal }) => {
   );
 };
 
-
-
+// Home Component
 const Home = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -287,123 +306,123 @@ const Home = () => {
               <img src={ImageReport} alt="report" />
               <h4>Laporan</h4>
               <p>Menyediakan layanan pelaporan jalan rusak</p>
-            </div>
-            <div className='content-info'>
-              <img src={ImageDatabase} alt="database" />
-              <h4>Terintegrasi</h4>
-              <p>Terintegrasi dengan informasi terbaru</p>
-            </div>
+          </div>
+          <div className='content-info'>
+            <img src={ImageDatabase} alt="database" />
+            <h4>Terintegrasi</h4>
+            <p>Terintegrasi dengan informasi terbaru</p>
           </div>
         </div>
-        <div id='faq' className='section-faq'>
-          <h2>FAQ</h2>
-          <p>Pertanyaan yang sering muncul</p>
-          <button id='acc1' className='accordion' onClick={() => accordion(1)}>
-            <h3>01</h3>
-            <h3>Bagaimana cara membuat laporan?</h3>
-            <div className='btn-accordion'>
-              <AddRoundedIcon fontSize='small' />
-            </div>
-          </button>
-          <div id='panel1' className='panel'>
-            <h5>
-              Anda dapat membuat laporan dengan menekan tombol “Lapor” dan selanjutnya akan diarahkan ke formulir pelaporan.
-            </h5>
+      </div>
+      <div id='faq' className='section-faq'>
+        <h2>FAQ</h2>
+        <p>Pertanyaan yang sering muncul</p>
+        <button id='acc1' className='accordion' onClick={() => accordion(1)}>
+          <h3>01</h3>
+          <h3>Bagaimana cara membuat laporan?</h3>
+          <div className='btn-accordion'>
+            <AddRoundedIcon fontSize='small' />
           </div>
-          <button id='acc2' className='accordion' onClick={() => accordion(2)}>
-            <h3>02</h3>
-            <h3>Bagaimana melihat laporan yang sudah terkirim?</h3>
-            <div className='btn-accordion'>
-              <AddRoundedIcon fontSize='small' />
-            </div>
-          </button>
-          <div id='panel2' className='panel'>
-            <h5>
-              Anda bisa melihatnya di Riwayat laporan.
-            </h5>
-          </div>
-          <button id='acc3' className='accordion' onClick={() => accordion(3)}>
-            <h3>03</h3>
-            <h3>Apa saja yang diperlukan dalam formulir laporan?</h3>
-            <div className='btn-accordion'>
-              <AddRoundedIcon fontSize='small' />
-            </div>
-          </button>
-          <div id='panel3' className='panel'>
-            <h5>
-              Memasukkan lokasi yang Anda mau lapor, setelah itu ada berapa sekiranya estimasi lubang yang Anda temui, dan masukkan foto atau gambar lubang yang ingin Anda lapor.
-            </h5>
-          </div>
-          <button id='acc4' className='accordion' onClick={() => accordion(4)}>
-            <h3>04</h3>
-            <h3>Bagaimana cara menghubungi kami?</h3>
-            <div className='btn-accordion'>
-              <AddRoundedIcon fontSize='small' />
-            </div>
-          </button>
-          <div id='panel4' className='panel'>
-            <h5>
-              Anda bisa menghubungi kami melalui sosial media kami yang tertera di pojok kanan paling bawah.
-            </h5>
-          </div>
+        </button>
+        <div id='panel1' className='panel'>
+          <h5>
+            Anda dapat membuat laporan dengan menekan tombol “Lapor” dan selanjutnya akan diarahkan ke formulir pelaporan.
+          </h5>
         </div>
-        <div id='aboutUs' className='section-about-us'>
-          <h2>Tentang Kami</h2>
-          <div className='content-about-us'>
-            <div className='left-side'>
-              <img src={ImageHolify} alt="holify-text" />
-            </div>
-            <div className='right-side'>
-              <h5>
-                Holify adalah platform yang menyediakan solusi dalam bidang infrastruktur jalanan. Platform ini memudahkan untuk melakukan pelaporan dan mencari informasi terkait jalanan rusak.
-              </h5>
-              <h5>
-                Dengan Holify, Anda dapat melakukan pelaporan terkait jalanan rusak di daerah Anda dengan cepat dan mudah secara online tanpa harus melaporkan secara langsung ke pihak berwajib karena dengan Holify akan menyampaikan laporan Anda kepada pihak pemerintah.
-              </h5>
-            </div>
+        <button id='acc2' className='accordion' onClick={() => accordion(2)}>
+          <h3>02</h3>
+          <h3>Bagaimana melihat laporan yang sudah terkirim?</h3>
+          <div className='btn-accordion'>
+            <AddRoundedIcon fontSize='small' />
           </div>
+        </button>
+        <div id='panel2' className='panel'>
+          <h5>
+            Anda bisa melihatnya di Riwayat laporan.
+          </h5>
         </div>
-        <div className='section-question'>
-          <h2>Di Sekitar Anda Ada Jalan Rusak ?</h2>
-          <button onClick={handleModal}>Laporkan Sekarang</button>
+        <button id='acc3' className='accordion' onClick={() => accordion(3)}>
+          <h3>03</h3>
+          <h3>Apa saja yang diperlukan dalam formulir laporan?</h3>
+          <div className='btn-accordion'>
+            <AddRoundedIcon fontSize='small' />
+          </div>
+        </button>
+        <div id='panel3' className='panel'>
+          <h5>
+            Memasukkan lokasi yang Anda mau lapor, setelah itu ada berapa sekiranya estimasi lubang yang Anda temui, dan masukkan foto atau gambar lubang yang ingin Anda lapor.
+          </h5>
         </div>
-        <div className='section-advice'>
+        <button id='acc4' className='accordion' onClick={() => accordion(4)}>
+          <h3>04</h3>
+          <h3>Bagaimana cara menghubungi kami?</h3>
+          <div className='btn-accordion'>
+            <AddRoundedIcon fontSize='small' />
+          </div>
+        </button>
+        <div id='panel4' className='panel'>
+          <h5>
+            Anda bisa menghubungi kami melalui sosial media kami yang tertera di pojok kanan paling bawah.
+          </h5>
+        </div>
+      </div>
+      <div id='aboutUs' className='section-about-us'>
+        <h2>Tentang Kami</h2>
+        <div className='content-about-us'>
           <div className='left-side'>
-            <h2>Kritik dan Saran</h2>
+            <img src={ImageHolify} alt="holify-text" />
           </div>
           <div className='right-side'>
-            <form>
-              <div className='input-name-number'>
-                <input type="text" placeholder='Nama Lengkap' />
-                <input type="number" placeholder='Nomor Telepon' />
-              </div>
-              <input type="email" placeholder='Email' />
-              <input type="text" placeholder='Pesan' />
-              <button>Kirim</button>
-            </form>
+            <h5>
+              Holify adalah platform yang menyediakan solusi dalam bidang infrastruktur jalanan. Platform ini memudahkan untuk melakukan pelaporan dan mencari informasi terkait jalanan rusak.
+            </h5>
+            <h5>
+              Dengan Holify, Anda dapat melakukan pelaporan terkait jalanan rusak di daerah Anda dengan cepat dan mudah secara online tanpa harus melaporkan secara langsung ke pihak berwajib karena dengan Holify akan menyampaikan laporan Anda kepada pihak pemerintah.
+            </h5>
           </div>
         </div>
-        <footer>
-          <div className='section-footer'>
-            <div className='section-list'>
-              <p onClick={() => scrollTo('beranda')}>Beranda</p>
-              <p onClick={() => navigate('/history')}>Riwayat</p>
-              <p onClick={() => scrollTo('faq')}>FAQ</p>
-              <p onClick={() => scrollTo('aboutUs')}>Tentang Kami</p>
+      </div>
+      <div className='section-question'>
+        <h2>Di Sekitar Anda Ada Jalan Rusak ?</h2>
+        <button onClick={handleModal}>Laporkan Sekarang</button>
+      </div>
+      <div className='section-advice'>
+        <div className='left-side'>
+          <h2>Kritik dan Saran</h2>
+        </div>
+        <div className='right-side'>
+          <form>
+            <div className='input-name-number'>
+              <input type="text" placeholder='Nama Lengkap' />
+              <input type="number" placeholder='Nomor Telepon' />
             </div>
-            <div className='cpyright'>
-              <p>@2024 Holify.com - All rights reserved</p>
-            </div>
-            <div className='sosmed'>
-              <img src={instagram} alt="instagram" />
-              <img src={twitter} alt="twitter" />
-            </div>
+            <input type="email" placeholder='Email' />
+            <input type="text" placeholder='Pesan' />
+            <button>Kirim</button>
+          </form>
+        </div>
+      </div>
+      <footer>
+        <div className='section-footer'>
+          <div className='section-list'>
+            <p onClick={() => scrollTo('beranda')}>Beranda</p>
+            <p onClick={() => navigate('/history')}>Riwayat</p>
+            <p onClick={() => scrollTo('faq')}>FAQ</p>
+            <p onClick={() => scrollTo('aboutUs')}>Tentang Kami</p>
           </div>
-        </footer>
-      </main>
-    </div>
+          <div className='cpyright'>
+            <p>@2024 Holify.com - All rights reserved</p>
+          </div>
+          <div className='sosmed'>
+            <img src={instagram} alt="instagram" />
+            <img src={twitter} alt="twitter" />
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
   );
 }
 
 export default Home;
-         
+       

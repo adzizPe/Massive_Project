@@ -1,27 +1,35 @@
 const express = require('express');
-const app = express();
 const mysql = require('mysql');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const authRoutes = require('./routes/authRoutes');
+
+const app = express();
+const PORT = 3002;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Multer configuration for file uploads
+// Buat folder uploads jika belum ada
+if (!fs.existsSync('uploads')) {
+  fs.mkdirSync('uploads');
+}
+
+// Setup multer untuk file upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
   }
 });
-
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
 const db = mysql.createConnection({
   user: 'root',
@@ -36,6 +44,33 @@ db.connect((err) => {
     return;
   }
   console.log('Connected to the database');
+});
+
+// Endpoint untuk menerima laporan
+app.post('/reports', upload.array('photos', 1), (req, res) => {
+  const { location, numberOfPotholes, additionalDetails, status, category } = req.body;
+
+  let foto;
+  if (req.files.length > 0) {
+    const file = req.files[0];
+    foto = file.buffer; // Mengambil data biner dari buffer file
+  }
+
+  console.log('Received report data:', req.body); // Debugging
+  console.log('Received photo data:', foto); // Debugging
+
+  const query = 'INSERT INTO laporan (location, description, status, category, foto) VALUES (?, ?, ?, ?, ?)';
+  const values = [location, additionalDetails, status, category, foto];
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error('Error inserting report:', err);
+      res.status(500).send('Error inserting report');
+      return;
+    }
+    console.log('Report inserted successfully:', result); // Debugging
+    res.status(200).send('Report submitted successfully');
+  });
 });
 
 app.get('/', (req, res) => {
@@ -84,7 +119,7 @@ app.post('/login', (req, res) => {
     if (results.length > 0) {
       const user = results[0];
       const passwordMatch = await bcrypt.compare(password, user.password);
-
+  
       if (passwordMatch) {
         const token = jwt.sign({ id: user.id }, 'your_secret_key', { expiresIn: '1h' });
         return res.status(200).send({ message: 'Authentication successful', token, username: user.username });
@@ -95,35 +130,9 @@ app.post('/login', (req, res) => {
       return res.status(401).send('Invalid email or password');
     }
   });
-});
-
-// Add report submission endpoint with debugging
-app.post('/reports', upload.array('photos', 10), (req, res) => {
-  const { iduser, location, description, status, category } = req.body;
-  const laporan_date = new Date();
-  const photos = req.files.map(file => file.filename);
-
-  if (!iduser || !location || !description) {
-    return res.status(400).send('ID user, location, and description are required');
-  }
-
-  const sql = 'INSERT INTO reports (iduser, laporan_date, location, description, status, category, photo) VALUES (?, ?, ?, ?, ?, ?, ?)';
-  const values = [iduser, laporan_date, location, description, status || 'pending', category, JSON.stringify(photos)];
-
-  db.query(sql, values, (err, results) => {
-    if (err) {
-      console.error('Error inserting report:', err);
-      return res.status(500).send('Error inserting report');
-    } else {
-      console.log('Report added successfully:', results);
-      return res.status(200).send({
-        message: 'Report added!',
-        reportId: results.insertId,
-      });
-    }
   });
-});
-
-app.listen(3002, () => {
-  console.log('Server is running on port 3002');
-});
+  
+  // Jalankan server
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
