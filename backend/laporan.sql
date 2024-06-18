@@ -7,3 +7,4 @@ CREATE TABLE laporan (
   status ENUM('menunggu', 'diproses', 'selesai'),
   category ENUM('berat', 'sedang'),
   photo BLOB
+  )
