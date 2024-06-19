@@ -48,19 +48,19 @@ db.connect((err) => {
 
 // Endpoint untuk menerima laporan
 app.post('/reports', upload.array('photos', 1), (req, res) => {
-  const { location, numberOfPotholes, additionalDetails, status, category } = req.body;
+  const { location, numberOfPotholes, additionalDetails, status, category, iduser } = req.body;
 
-  let foto;
+  let photo;
   if (req.files.length > 0) {
     const file = req.files[0];
-    foto = file.buffer; // Mengambil data biner dari buffer file
+    photo = file.filename; // Mengambil nama file
   }
 
   console.log('Received report data:', req.body); // Debugging
-  console.log('Received photo data:', foto); // Debugging
+  console.log('Received photo data:', photo); // Debugging
 
-  const query = 'INSERT INTO laporan (location, description, status, category, foto) VALUES (?, ?, ?, ?, ?)';
-  const values = [location, additionalDetails, status, category, foto];
+  const query = 'INSERT INTO laporan (iduser, laporan_date, location, description, status, category, photo) VALUES (?, NOW(), ?, ?, ?, ?, ?)';
+  const values = [iduser, location, additionalDetails, status, category, photo];
 
   db.query(query, values, (err, result) => {
     if (err) {
@@ -104,7 +104,6 @@ app.post('/register', async (req, res) => {
     return res.status(500).send('Error hashing password');
   }
 });
-
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -121,7 +120,7 @@ app.post('/login', (req, res) => {
       const passwordMatch = await bcrypt.compare(password, user.password);
   
       if (passwordMatch) {
-        const token = jwt.sign({ id: user.id }, 'your_secret_key', { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.iduser }, 'your_secret_key', { expiresIn: '1h' });
         return res.status(200).send({ message: 'Authentication successful', token, username: user.username });
       } else {
         return res.status(401).send('Invalid email or password');
@@ -130,9 +129,9 @@ app.post('/login', (req, res) => {
       return res.status(401).send('Invalid email or password');
     }
   });
-  });
-  
-  // Jalankan server
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
+});
+
+// Jalankan server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

@@ -98,9 +98,6 @@ const Modal = ({ closeModal }) => {
     closeModal(false);
   };
 
-
-
-
   return (
     <div className='container-modal'>
       {alert &&
@@ -135,59 +132,61 @@ const Modal = ({ closeModal }) => {
               />
               <div className='double-box-input'>
                 <div className='box-input'>
-                  <label htmlFor="numberOfPotholes">Estimasi Jumlah Lubang*</label>
-                  <input 
-                    type="number" 
-                    id='numberOfPotholes' 
-                    value={formData.numberOfPotholes}
-                    onChange={handleChange}
-                    required 
-                  />
-                </div>
-                <div className='box-input'>
-                  <label htmlFor="additionalDetails">Detail Tambahan (opsional)</label>
-                  <input 
-                    type="text" 
-                    id='additionalDetails' 
-                    value={formData.additionalDetails}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-              <div className="drop-container" onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
-                <input 
-                  type="file" 
-                  id="fileInput" 
-                  className="drop-input" 
-                  accept="image/*" 
-                  multiple 
-                  onChange={handleFileInputChange} 
-                />
-                <label htmlFor="fileInput" className="drop-label">
-                  <img src={ImgUpload} alt="upload" />
-                  <div>
-                    <p>Select a file or drag and drop here</p>
-                    <p>JPG, PNG or PDF, file size no more than 10MB</p>
-                  </div>
-                  <img src={ImgSelect} alt="select" />
-                </label>
-                <div className="file-list">{fileList}</div>
-              </div>
-              <div>
-                <div className='btn-group'>
-                  <button type='button' className='btn-remove' onClick={close}>Batal</button>
-                  <button type='submit'>Kirim</button>
-                </div>
-              </div>
-            </form>
+                <label htmlFor="numberOfPotholes">Estimasi Jumlah Lubang*</label>
+              <input 
+                type="number" 
+                id='numberOfPotholes' 
+                value={formData.numberOfPotholes}
+                onChange={handleChange}
+                required 
+              />
+            </div>
+            <div className='box-input'>
+              <label htmlFor="additionalDetails">Detail Tambahan (opsional)</label>
+              <input 
+                type="text" 
+                id='additionalDetails' 
+                value={formData.additionalDetails}
+                onChange={handleChange}
+              />
+            </div>
           </div>
-        </div>
-      }
+          <div className="drop-container" onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
+            <input 
+              type="file" 
+              id="fileInput" 
+              className="drop-input" 
+              accept="image/*" 
+              multiple 
+              onChange={handleFileInputChange} 
+            />
+            <label htmlFor="fileInput" className="drop-label">
+              <img src={ImgUpload} alt="upload" />
+              <div>
+                <p>Select a file or drag and drop here</p>
+                <p>JPG, PNG or PDF, file size no more than 10MB</p>
+              </div>
+              <img src={ImgSelect} alt="select" />
+            </label>
+            <div className="file-list">{fileList}</div>
+          </div>
+          <div>
+            <div className='btn-group'>
+              <button type='button' className='btn-remove' onClick={close}>Batal</button>
+              <button type='submit'>Kirim</button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
-  );
+  }
+</div>
+);
 };
 
-// Home Component
+
+
+
 const Home = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
