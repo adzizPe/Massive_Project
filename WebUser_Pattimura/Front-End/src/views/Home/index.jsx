@@ -49,6 +49,46 @@ const Modal = ({ closeModal }) => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
+  const handleSaveChanges = async () => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const formData = new FormData();
+    formData.append('name', userData.name);
+    formData.append('email', userData.email);
+    formData.append('oldPassword', userData.oldPassword);
+    formData.append('newPassword', userData.newPassword);
+    formData.append('username', userData.username);
+    formData.append('telp', userData.phoneNumber);
+    if (profilePicture) {
+      formData.append('profilePicture', profilePicture);
+    }
+
+    const response = await fetch('http://localhost:3002/profile', {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: formData
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      alert(data.message); // Show success message from backend
+      // Update local state or refresh profile data
+      if (profilePicture) {
+        const profilePictureURL = URL.createObjectURL(profilePicture);
+        localStorage.setItem('profilePicture', profilePictureURL);
+      }
+      localStorage.setItem('userData', JSON.stringify(userData));
+    } else {
+      const errorData = await response.json();
+      alert(errorData.error); // Show error message from backend
+    }
+  } catch (error) {
+    alert('An error occurred while updating the profile.');
+    console.error(error);
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();

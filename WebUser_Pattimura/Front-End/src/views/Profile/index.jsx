@@ -8,7 +8,7 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 const Profile = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState(null);
-  const [profilePicture, setProfilePicture] = useState(null); // State untuk menyimpan gambar profil
+  const [profilePicture, setProfilePicture] = useState(null);
   const [userData, setUserData] = useState({
     name: '',
     email: '',
@@ -26,7 +26,6 @@ const Profile = () => {
       setUsername(storedUsername);
     }
 
-    // Ambil data pengguna dari localStorage atau backend
     const storedUserData = JSON.parse(localStorage.getItem('userData'));
     if (storedUserData) {
       setUserData(storedUserData);
@@ -43,7 +42,7 @@ const Profile = () => {
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
-    setProfilePicture(URL.createObjectURL(file));
+    setProfilePicture(file);
   };
 
   const handleRemoveProfilePicture = () => {
@@ -52,35 +51,41 @@ const Profile = () => {
 
   const handleSaveChanges = async () => {
     try {
-        const authToken = localStorage.getItem('authToken');
-        const formData = new FormData();
-        formData.append('name', userData.name);
-        // ... append other fields ...
-        if (profilePicture) {
-            formData.append('profilePicture', profilePicture);
-        }
-
-        const response = await fetch('/profile', {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${authToken}` },
-            body: formData 
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            alert(data.message); // Show success message from backend
-            // ... update local state or refresh profile data ...
-        } else {
-            const errorData = await response.json();
-            alert(errorData.error); // Show error message from backend
-        }
+      const authToken = localStorage.getItem('authToken');
+      const formData = new FormData();
+      formData.append('name', userData.name);
+      formData.append('email', userData.email);
+      formData.append('oldPassword', userData.oldPassword);
+      formData.append('newPassword', userData.newPassword);
+      formData.append('username', userData.username);
+      formData.append('telp', userData.phoneNumber);
+      if (profilePicture) {
+        formData.append('profilePicture', profilePicture);
+      }
+  
+      const response = await fetch('http://localhost:3002/profile', { // Ganti URL di sini
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: formData
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        alert(data.message); // Show success message from backend
+        // Update local state or refresh profile data
+        localStorage.setItem('userData', JSON.stringify(userData));
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error); // Show error message from backend
+      }
     } catch (error) {
-        alert('An error occurred while updating the profile.');
-        console.error(error);
+      alert('An error occurred while updating the profile.');
+      console.error(error);
     }
-};
-
-
+  };
+  
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('username');
@@ -88,8 +93,6 @@ const Profile = () => {
     setUsername(null);
     navigate('/login');
   };
-
-  
 
   return (
     <div className='page'>
@@ -138,7 +141,7 @@ const Profile = () => {
               <button onClick={handleSaveChanges}>Simpan</button>
             </div>
             <div className='right-side'>
-              <img src={profilePicture || imgProfile} alt="profile" className='profile-picture' />
+              <img src={profilePicture ? URL.createObjectURL(profilePicture) : imgProfile} alt="profile" className='profile-picture' />
               <div className='section-btn-profile'>
                 <input type="file" accept="image/*" onChange={handleProfilePictureChange} style={{ display: 'none' }} id="upload-button" />
                 <button onClick={() => document.getElementById('upload-button').click()}>Ganti</button>
