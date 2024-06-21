@@ -7,6 +7,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const authRoutes = require('./routes/authRoutes');
+const profileRoutes = require('./routes/profileRoutes'); // Assuming you have a separate profileRoutes file
+
 
 const app = express();
 const PORT = 3002;
@@ -22,13 +24,12 @@ if (!fs.existsSync('uploads')) {
 
 // Setup multer untuk file upload
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
+  destination: 'uploads/',
   filename: (req, file, cb) => {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+      cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
   }
 });
+
 const upload = multer({ storage });
 
 const db = mysql.createConnection({
@@ -44,6 +45,50 @@ db.connect((err) => {
     return;
   }
   console.log('Connected to the database');
+});
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.sendStatus(401); // Unauthorized
+
+  jwt.verify(token, 'your_secret_key', (err, user) => {
+      if (err) return res.sendStatus(403); // Forbidden
+      req.user = user; 
+      next();
+  });
+}
+app.put('/profile', authenticateToken, upload.single('profilePicture'), (req, res) => {
+  const userId = req.user.id; 
+  const { name, email, oldPassword, newPassword, username, telp } = req.body;
+
+  let updateQuery = 'UPDATE user SET name = ?, username = ?, email = ?, telp = ?';
+  let updateValues = [name, username, email, telp, userId];
+
+  // Handle password change
+  if (oldPassword && newPassword) {
+      // ... password update logic (fetch user, compare old password, hash new password) ...
+      updateQuery += ', password = ?';
+      updateValues.push(hashedNewPassword);
+  }
+
+  // Handle profile picture
+  let profilePicture = null;
+  if (req.file) {
+      profilePicture = req.file.filename;
+      updateQuery += ', profile_picture = ?';
+      updateValues.push(profilePicture);
+  }
+
+  updateQuery += ' WHERE iduser = ?';
+
+  db.query(updateQuery, updateValues, (err, result) => {
+      if (err) {
+          console.error('Error updating profile:', err);
+          return res.status(500).json({ error: 'Failed to update profile' });
+      }
+      res.json({ message: 'Profile updated successfully' });
+  });
 });
 
 // Endpoint untuk menerima laporan
@@ -78,6 +123,17 @@ app.get('/', (req, res) => {
 });
 
 app.use('/auth', authRoutes);
+
+app.use('/profile', authenticateToken, (req, res, next) => {
+  req.upload = upload;
+  req.db = db; 
+  next();
+}, profileRoutes);
+
+app.use((err, req, res, next) => {
+  console.error(err.stack); 
+  res.status(500).send('Something broke!');
+});
 
 app.post('/register', async (req, res) => {
   const { name, username, email, telp, password } = req.body;

@@ -50,11 +50,36 @@ const Profile = () => {
     setProfilePicture(null);
   };
 
-  const handleSaveChanges = () => {
-    // Simpan perubahan ke localStorage atau kirim ke backend
-    localStorage.setItem('userData', JSON.stringify(userData));
-    alert('Perubahan berhasil disimpan.');
-  };
+  const handleSaveChanges = async () => {
+    try {
+        const authToken = localStorage.getItem('authToken');
+        const formData = new FormData();
+        formData.append('name', userData.name);
+        // ... append other fields ...
+        if (profilePicture) {
+            formData.append('profilePicture', profilePicture);
+        }
+
+        const response = await fetch('/profile', {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${authToken}` },
+            body: formData 
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert(data.message); // Show success message from backend
+            // ... update local state or refresh profile data ...
+        } else {
+            const errorData = await response.json();
+            alert(errorData.error); // Show error message from backend
+        }
+    } catch (error) {
+        alert('An error occurred while updating the profile.');
+        console.error(error);
+    }
+};
+
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
