@@ -14,12 +14,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Buat folder uploads jika belum ada
+
 if (!fs.existsSync('uploads')) {
   fs.mkdirSync('uploads');
 }
 
-// Setup multer untuk file upload
 const storage = multer.diskStorage({
   destination: 'uploads/',
   filename: (req, file, cb) => {
